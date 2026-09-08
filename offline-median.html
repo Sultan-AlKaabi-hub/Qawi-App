@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<!--
+  offline-median.html — for Median's *custom offline page* slot only.
+
+  Median requires this page to be fully self-contained, because it is displayed
+  with no network at all: no external stylesheet, no external script, no remote
+  images. So everything here is inlined and there is one small SVG, drawn with
+  markup rather than fetched.
+  Ref: https://docs.median.co/docs/offline-page
+
+  Do NOT confuse this with ./offline.html, which is the service worker's
+  navigation fallback and is allowed to use the cached stylesheet and modules.
+  Upload this file's contents into App Studio → Offline Page → custom page.
+-->
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Qawi</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100dvh; display: grid; place-items: center;
+      padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
+      background: #101012; color: #f6f4f1; text-align: center;
+      font-family: -apple-system, "Segoe UI", Roboto, system-ui, sans-serif;
+      line-height: 1.5;
+    }
+    [lang="ar"] body, body[lang="ar"] {
+      font-family: "SF Arabic", "Geeza Pro", "Noto Sans Arabic", "Dubai", Tahoma, sans-serif;
+      line-height: 1.75;
+    }
+    .wrap { max-width: 340px; }
+    h1 { font-size: 1.6rem; font-weight: 720; letter-spacing: -.02em; margin: 24px 0 8px; }
+    :lang(ar) h1 { letter-spacing: 0; }
+    p { color: #a2a2ad; margin: 0 0 28px; }
+    button {
+      display: block; width: 100%; min-height: 48px; border: 0; cursor: pointer;
+      border-radius: 999px; background: #ff4e11; color: #fff;
+      font: inherit; font-weight: 700;
+    }
+    button:focus-visible { outline: 3px solid #ff7a3d; outline-offset: 2px; }
+    svg { margin-inline: auto; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <svg width="72" height="72" viewBox="0 0 512 512" role="img" aria-label="Qawi">
+      <rect width="512" height="512" rx="112" fill="#17171a"/>
+      <path d="M256 92a164 164 0 1 1-96 297" fill="none" stroke="#ff4e11" stroke-width="44" stroke-linecap="round"/>
+      <line x1="278" y1="300" x2="410" y2="432" stroke="#f6f4f1" stroke-width="38" stroke-linecap="round"/>
+    </svg>
+    <h1 id="t">No connection</h1>
+    <p id="b">Your sessions, plan and saved routes are still on this device. Reconnect to load the rest.</p>
+    <button id="r" type="button">Try again</button>
+  </div>
+
+  <script>
+    (function () {
+      var ar = (navigator.language || 'en').toLowerCase().indexOf('ar') === 0;
+      if (ar) {
+        document.documentElement.lang = 'ar';
+        document.documentElement.dir = 'rtl';
+        document.getElementById('t').textContent = 'لا يوجد اتصال';
+        document.getElementById('b').textContent =
+          'جلساتك وخطتك ومساراتك المحفوظة ما زالت على هذا الجهاز. أعد الاتصال لتحميل البقية.';
+        document.getElementById('r').textContent = 'حاول مرة أخرى';
+      }
+      document.getElementById('r').addEventListener('click', function () {
+        // Median's bridge reloads the webview properly; plain reload is the
+        // fallback when this page is opened outside the wrapper.
+        if (window.median && window.median.webview && window.median.webview.reload) {
+          window.median.webview.reload();
+        } else {
+          location.reload();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

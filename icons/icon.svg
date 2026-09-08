@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Qawi">
+  <rect width="512" height="512" rx="112" fill="#101012"/>
+  <path d="M256 92a164 164 0 1 1-96 297" fill="none" stroke="#ff4e11" stroke-width="44" stroke-linecap="round"/>
+  <line x1="278" y1="300" x2="410" y2="432" stroke="#f6f4f1" stroke-width="38" stroke-linecap="round"/>
+  <circle cx="318" cy="340" r="27" fill="#f6f4f1"/>
+  <circle cx="381" cy="403" r="19" fill="#f6f4f1"/>
+</svg>

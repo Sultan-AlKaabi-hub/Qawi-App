@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Qawi — No connection</title>
+  <meta name="theme-color" content="#101012">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./css/app.css">
+  <script src="./js/boot.js"></script>
+</head>
+<body>
+  <main class="main" id="main">
+    <div class="empty" style="margin-block-start:20vh">
+      <h1 data-i18n="offline.title">No connection</h1>
+      <p style="margin-inline:auto" data-i18n="offline.body">This page has not been saved for offline use yet.</p>
+      <div style="display:grid;gap:var(--s3);max-inline-size:280px;margin-inline:auto;margin-block-start:var(--s6)">
+        <button class="btn btn--primary btn--block" data-action="retry" data-i18n="offline.retry">Try again</button>
+        <a class="btn btn--ghost btn--block" href="./index.html" data-i18n="offline.goHome">Go to Home</a>
+      </div>
+    </div>
+  </main>
+  <script type="module" src="./js/page-offline.js"></script>
+</body>
+</html>
