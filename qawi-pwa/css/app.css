@@ -1,0 +1,425 @@
+/* =============================================================================
+   QAWI — Design tokens & app shell
+   -----------------------------------------------------------------------------
+   Authoring rules for this file:
+   1. Layout uses CSS *logical properties* (inline-start/end, margin-inline, ...)
+      so the entire UI mirrors automatically when <html dir="rtl"> is set for
+      Arabic. No RTL-specific stylesheet is required.
+      Ref: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_logical_properties
+   2. Every interactive target is >= 44x44 CSS px (WCAG 2.2 SC 2.5.8 Target Size
+      requires 24x24; 44 is the Apple HIG / Material recommendation).
+   3. Colour pairs are checked for >= 4.5:1 body contrast, >= 3:1 for large text
+      and UI boundaries (WCAG 2.2 SC 1.4.3 / 1.4.11).
+   4. Motion is opt-out via prefers-reduced-motion (WCAG 2.2 SC 2.3.3).
+   ========================================================================== */
+
+/* ---------- 1. Tokens ----------------------------------------------------- */
+:root {
+  /* Surface ramp — dark is the product default (matches the reference art) */
+  --bg:            #101012;
+  --bg-elev:       #17171a;
+  --bg-elev-2:     #202026;
+  --bg-sunken:     #0a0a0b;
+  --line:          #2b2b33;
+  --line-soft:     #212128;
+
+  /* Ink ramp */
+  --ink:           #f6f4f1;
+  --ink-mute:      #a2a2ad;
+  --ink-dim:       #71717c;
+  --ink-invert:    #101012;
+
+  /* Brand: ember. One accent, used for state and progress — never decoration. */
+  --ember:         #ff4e11;
+  --ember-bright:  #ff7a3d;
+  --ember-deep:    #c8330a;
+  --ember-wash:    rgba(255, 78, 17, 0.14);
+  --ember-line:    rgba(255, 78, 17, 0.42);
+
+  /* Muscle-load heat scale (cold -> hot). Also used by charts. */
+  --heat-0:        #313138;
+  --heat-1:        #6b3a22;
+  --heat-2:        #b0490f;
+  --heat-3:        #ff5f14;
+  --heat-4:        #ffa02b;
+
+  /* Semantic */
+  --ok:            #37c26a;
+  --warn:          #ffb020;
+  --danger:        #ff5a5a;
+  --offline:       #ffb020;
+
+  /* Geometry */
+  --r-lg: 22px;
+  --r-md: 16px;
+  --r-sm: 10px;
+  --r-pill: 999px;
+  --tap: 44px;
+
+  /* Space scale (4pt base) */
+  --s1: 4px;  --s2: 8px;  --s3: 12px; --s4: 16px;
+  --s5: 20px; --s6: 24px; --s7: 32px; --s8: 44px;
+
+  /* Elevation — one shadow, two intensities. No shadow on flat cards. */
+  --shadow-1: 0 1px 2px rgba(0,0,0,.4);
+  --shadow-2: 0 12px 32px rgba(0,0,0,.55);
+
+  /* Type. Latin: platform grotesque. Arabic: platform Arabic UI faces first,
+     which keeps the app fully offline (no webfont fetch) and renders a
+     properly shaped, highly legible naskh on every target OS. */
+  --font-latin: "Inter Tight", "Inter", -apple-system, BlinkMacSystemFont,
+                "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-arabic: "SF Arabic", "Geeza Pro", "Noto Sans Arabic", "Dubai",
+                 "Segoe UI", Tahoma, sans-serif;
+  --font: var(--font-latin);
+
+  /* Numeric readouts stay tabular so timers don't jitter while counting. */
+  --font-num: var(--font);
+
+  /* Safe areas (notch / home indicator / dynamic island) */
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+
+  --tabbar-h: 64px;
+  --topbar-h: 56px;
+
+  color-scheme: dark;
+}
+
+/* Light theme — the training-plan and exercise references are light UIs, so
+   both are first-class, not an afterthought. Toggled from Settings. */
+[data-theme="light"] {
+  --bg:            #ffffff;
+  --bg-elev:       #f6f6f8;
+  --bg-elev-2:     #ededf1;
+  --bg-sunken:     #ececed;
+  --line:          #dcdce2;
+  --line-soft:     #e8e8ee;
+  --ink:           #131316;
+  --ink-mute:      #5c5c67;
+  --ink-dim:       #83838f;
+  --ink-invert:    #ffffff;
+  --ember:         #d63b06;
+  --ember-bright:  #ff5f14;
+  --ember-wash:    rgba(214, 59, 6, 0.10);
+  --ember-line:    rgba(214, 59, 6, 0.35);
+  --heat-0:        #dededf;
+  --heat-1:        #f0c3a8;
+  --heat-2:        #f08a4b;
+  --heat-3:        #e8511a;
+  --heat-4:        #b83a06;
+  --shadow-1: 0 1px 2px rgba(16,16,18,.08);
+  --shadow-2: 0 12px 32px rgba(16,16,18,.14);
+  color-scheme: light;
+}
+
+/* Arabic switches the whole family; letter-spacing is reset because negative
+   tracking breaks Arabic joining and hurts legibility. */
+:root:lang(ar), [lang="ar"] { --font: var(--font-arabic); }
+
+/* ---------- 2. Reset ------------------------------------------------------ */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.5;
+  overscroll-behavior-y: none;   /* no rubber-band on an app-like shell */
+  -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
+}
+
+img, svg { display: block; max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+
+/* Visible, high-contrast focus for every keyboard user. */
+:focus-visible {
+  outline: 3px solid var(--ember-bright);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+:focus:not(:focus-visible) { outline: none; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.skip-link {
+  position: fixed; inset-block-start: -100px; inset-inline-start: var(--s4);
+  z-index: 100; background: var(--ember); color: #fff;
+  padding: var(--s3) var(--s4); border-radius: var(--r-sm); font-weight: 650;
+}
+.skip-link:focus { inset-block-start: calc(var(--safe-t) + var(--s2)); }
+
+/* ---------- 3. Typography ------------------------------------------------- */
+h1, h2, h3 { margin: 0; font-weight: 720; line-height: 1.12; }
+h1 { font-size: clamp(1.6rem, 6.5vw, 2.1rem); letter-spacing: -0.025em; }
+h2 { font-size: 1.2rem; letter-spacing: -0.015em; }
+h3 { font-size: 1rem;   letter-spacing: -0.01em; }
+p  { margin: 0 0 var(--s3); max-width: 62ch; }
+
+:lang(ar) h1, :lang(ar) h2, :lang(ar) h3 { letter-spacing: 0; line-height: 1.35; }
+:lang(ar) body { line-height: 1.75; }   /* Arabic needs more leading to read well */
+
+.eyebrow { font-size: .8rem; color: var(--ink-mute); font-weight: 600; margin: 0 0 var(--s1); }
+.muted   { color: var(--ink-mute); }
+.num     { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+
+/* ---------- 4. App shell -------------------------------------------------- */
+.app {
+  min-height: 100dvh;                 /* dvh survives mobile URL-bar collapse */
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.topbar {
+  position: sticky; inset-block-start: 0; z-index: 20;
+  display: flex; align-items: center; gap: var(--s2);
+  min-height: calc(var(--topbar-h) + var(--safe-t));
+  padding: var(--safe-t) calc(var(--s4) + var(--safe-r)) 0 calc(var(--s4) + var(--safe-l));
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: saturate(140%) blur(14px);
+  border-block-end: 1px solid var(--line-soft);
+}
+.topbar__title { flex: 1; font-size: 1.05rem; font-weight: 700; letter-spacing: -.01em; }
+.topbar__title small { display: block; font-size: .75rem; font-weight: 500; color: var(--ink-mute); letter-spacing: 0; }
+
+.iconbtn {
+  min-width: var(--tap); min-height: var(--tap);
+  display: grid; place-items: center;
+  background: var(--bg-elev); color: var(--ink);
+  border: 1px solid var(--line-soft); border-radius: var(--r-pill);
+  cursor: pointer;
+}
+.iconbtn:active { background: var(--bg-elev-2); }
+.iconbtn svg { width: 20px; height: 20px; }
+/* Directional glyphs mirror in RTL; symmetric ones must opt out with .no-flip */
+[dir="rtl"] .iconbtn svg:not(.no-flip) { transform: scaleX(-1); }
+
+.main {
+  padding-inline: calc(var(--s4) + var(--safe-l)) calc(var(--s4) + var(--safe-r));
+  padding-block: var(--s5) calc(var(--tabbar-h) + var(--safe-b) + var(--s7));
+}
+.main > * + * { margin-block-start: var(--s6); }
+
+/* ---------- 5. Bottom tab bar -------------------------------------------- */
+.tabbar {
+  position: fixed; inset-block-end: 0; inset-inline: 0; z-index: 30;
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  padding-block-end: var(--safe-b);
+  padding-inline: var(--safe-l) var(--safe-r);
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: saturate(140%) blur(16px);
+  border-block-start: 1px solid var(--line);
+}
+.tab {
+  min-height: var(--tabbar-h);
+  display: grid; place-items: center; gap: 3px;
+  padding-block: var(--s2);
+  color: var(--ink-mute); text-decoration: none; font-size: .68rem; font-weight: 600;
+}
+.tab svg { width: 22px; height: 22px; }
+.tab[aria-current="page"] { color: var(--ember); }
+.tab[aria-current="page"] .tab__label { font-weight: 750; }
+
+/* ---------- 6. Cards, lists ---------------------------------------------- */
+.card {
+  background: var(--bg-elev);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-lg);
+  padding: var(--s5);
+}
+.card--flush { padding: 0; overflow: hidden; }
+.card--quiet { background: transparent; border-color: var(--line); }
+
+.section-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3);
+  margin-block-end: var(--s3);
+}
+.section-head a { color: var(--ember); text-decoration: none; font-size: .85rem; font-weight: 650; }
+
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s5) var(--s4); }
+.stat__label { font-size: .8rem; color: var(--ink-mute); }
+.stat__value { font-size: 1.5rem; font-weight: 720; letter-spacing: -.02em; }
+.stat__value span { font-size: .8rem; font-weight: 600; color: var(--ink-mute); margin-inline-start: 2px; }
+
+/* ---------- 7. Buttons ---------------------------------------------------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);
+  min-height: var(--tap); padding-inline: var(--s6);
+  border-radius: var(--r-pill); border: 1px solid transparent;
+  font-weight: 700; letter-spacing: -.01em; cursor: pointer;
+  background: var(--bg-elev-2); color: var(--ink);
+  text-decoration: none;
+}
+.btn--primary { background: var(--ember); color: #fff; }
+.btn--primary:active { background: var(--ember-deep); }
+.btn--ghost { background: transparent; border-color: var(--line); }
+.btn--danger { background: transparent; border-color: var(--danger); color: var(--danger); }
+.btn--block { display: flex; width: 100%; }
+.btn[disabled] { opacity: .45; cursor: not-allowed; }
+.btn svg { width: 18px; height: 18px; }
+
+/* ---------- 8. Chips / filters ------------------------------------------- */
+.chips { display: flex; gap: var(--s2); overflow-x: auto; scrollbar-width: none;
+         padding-block-end: var(--s1); margin-inline: calc(var(--s4) * -1); padding-inline: var(--s4); }
+.chips::-webkit-scrollbar { display: none; }
+.chip {
+  flex: 0 0 auto; min-height: 40px; padding-inline: var(--s4);
+  display: inline-flex; align-items: center; gap: var(--s2);
+  border-radius: var(--r-pill); border: 1px solid var(--line);
+  background: var(--bg-elev); color: var(--ink); font-size: .88rem; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
+}
+.chip[aria-pressed="true"], .chip[aria-selected="true"] {
+  border-color: var(--ember-line); color: var(--ember); background: var(--ember-wash);
+}
+
+/* ---------- 9. Forms ------------------------------------------------------ */
+.field { display: grid; gap: var(--s2); }
+.field > label { font-weight: 650; font-size: .92rem; }
+.field .hint { font-size: .82rem; color: var(--ink-mute); }
+.input, select.input {
+  min-height: var(--tap); width: 100%;
+  background: var(--bg-elev-2); color: var(--ink);
+  border: 1px solid var(--line); border-radius: var(--r-md);
+  padding-inline: var(--s4); padding-block: var(--s2);
+}
+.input:focus-visible { border-color: var(--ember); }
+
+.row {
+  display: flex; align-items: center; gap: var(--s4);
+  min-height: 56px; padding-block: var(--s2);
+  border-block-end: 1px solid var(--line-soft);
+}
+.row:last-child { border-block-end: 0; }
+.row__text { flex: 1; min-width: 0; }
+.row__text small { display: block; color: var(--ink-mute); font-size: .8rem; }
+
+/* Switch — a real checkbox underneath for screen readers and keyboards. */
+.switch { position: relative; inline-size: 52px; block-size: 32px; flex: 0 0 auto; }
+.switch input { position: absolute; inset: 0; opacity: 0; margin: 0; inline-size: 100%; block-size: 100%; }
+.switch__track {
+  position: absolute; inset: 0; border-radius: var(--r-pill);
+  background: var(--bg-elev-2); border: 1px solid var(--line);
+  transition: background .18s ease;
+}
+.switch__track::after {
+  content: ""; position: absolute; inset-block-start: 3px; inset-inline-start: 3px;
+  inline-size: 24px; block-size: 24px; border-radius: 50%;
+  background: var(--ink-mute); transition: transform .18s ease, background .18s ease;
+}
+.switch input:checked + .switch__track { background: var(--ember); border-color: var(--ember); }
+.switch input:checked + .switch__track::after { background: #fff; transform: translateX(20px); }
+[dir="rtl"] .switch input:checked + .switch__track::after { transform: translateX(-20px); }
+.switch input:focus-visible + .switch__track { outline: 3px solid var(--ember-bright); outline-offset: 2px; }
+
+/* Day picker (training plan) */
+.daypicker { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--s2); text-align: center; }
+.daypicker__head { font-size: .78rem; color: var(--ink-mute); font-weight: 650; }
+.day {
+  inline-size: 100%; aspect-ratio: 1; max-inline-size: 46px; min-block-size: 44px;
+  margin-inline: auto; border-radius: 50%;
+  border: 2px solid var(--line); background: transparent; color: var(--ink-mute);
+  font-weight: 700; cursor: pointer;
+}
+.day[aria-pressed="true"] { background: var(--ember); border-color: var(--ember); color: #fff; }
+.day[data-long="true"] { box-shadow: 0 0 0 2px var(--ok); }
+
+/* ---------- 10. Rings & progress ----------------------------------------- */
+.rings { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s3); text-align: center; }
+.ring { position: relative; inline-size: 100%; max-inline-size: 104px; margin-inline: auto; aspect-ratio: 1; }
+.ring svg { inline-size: 100%; block-size: 100%; transform: rotate(-90deg); }
+.ring__track { fill: none; stroke: var(--bg-elev-2); stroke-width: 7; }
+.ring__bar   { fill: none; stroke: var(--ember); stroke-width: 7; stroke-linecap: round;
+               transition: stroke-dashoffset .35s ease; }
+.ring__value {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  font-size: 1.35rem; font-weight: 720; letter-spacing: -.02em;
+}
+.ring__caption { font-size: .78rem; color: var(--ink-mute); margin-block-start: var(--s2); }
+
+.meter { block-size: 8px; background: var(--bg-elev-2); border-radius: var(--r-pill); overflow: hidden; }
+.meter__fill { block-size: 100%; background: var(--ember); border-radius: inherit;
+               transition: inline-size .3s ease; }
+
+/* ---------- 11. Body heat map -------------------------------------------- */
+.bodymap { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); }
+.bodymap svg { inline-size: 100%; height: auto; }
+.bodymap__caption { grid-column: 1 / -1; display: flex; align-items: center;
+                    gap: var(--s2); font-size: .78rem; color: var(--ink-mute); }
+.heatkey { display: flex; gap: 3px; }
+.heatkey i { inline-size: 18px; block-size: 8px; border-radius: 2px; display: block; }
+.muscle { transition: fill .4s ease; }
+
+/* ---------- 12. Route map ------------------------------------------------- */
+.mapcanvas { position: relative; border-radius: var(--r-lg); overflow: hidden;
+             background: var(--bg-sunken); border: 1px solid var(--line-soft); }
+.mapcanvas svg { inline-size: 100%; height: auto; }
+.mapcanvas__overlay { position: absolute; inset-block-end: var(--s3); inset-inline: var(--s3); }
+
+.route { display: flex; gap: var(--s4); align-items: center; padding: var(--s3) 0;
+         border-block-end: 1px solid var(--line-soft); text-decoration: none; color: inherit; }
+.route:last-child { border-block-end: 0; }
+.route__thumb { inline-size: 76px; block-size: 76px; flex: 0 0 auto; border-radius: var(--r-md);
+                background: var(--bg-elev-2); overflow: hidden; }
+.route__meta { font-size: .84rem; color: var(--ink-mute); display: flex; flex-wrap: wrap; gap: var(--s3); }
+.route__tag { color: var(--ember); font-weight: 650; font-size: .82rem; }
+
+/* ---------- 13. Feed / activity ------------------------------------------ */
+.activity__head { display: flex; align-items: center; gap: var(--s3); margin-block-end: var(--s3); }
+.avatar { inline-size: 40px; block-size: 40px; border-radius: var(--r-sm); background: var(--ember-wash);
+          display: grid; place-items: center; font-weight: 750; color: var(--ember); flex: 0 0 auto; }
+
+/* ---------- 14. Status: offline / toast / empty -------------------------- */
+.banner {
+  display: none; align-items: center; gap: var(--s3);
+  padding: var(--s3) var(--s4); border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--warn) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--warn) 45%, transparent);
+  font-size: .88rem;
+}
+body.is-offline .banner--offline { display: flex; }
+
+.toast {
+  position: fixed; inset-inline: var(--s4);
+  inset-block-end: calc(var(--tabbar-h) + var(--safe-b) + var(--s4));
+  z-index: 60; margin-inline: auto; max-inline-size: 420px;
+  background: var(--bg-elev-2); color: var(--ink);
+  border: 1px solid var(--line); border-radius: var(--r-md);
+  padding: var(--s3) var(--s4); box-shadow: var(--shadow-2);
+  transform: translateY(12px); opacity: 0; pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease;
+}
+.toast[data-open="true"] { opacity: 1; transform: none; }
+
+.empty { text-align: center; padding: var(--s7) var(--s4); color: var(--ink-mute); }
+.empty h3 { color: var(--ink); margin-block-end: var(--s2); }
+
+/* ---------- 15. Motion ---------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important; scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- 16. Larger viewports (foldables, tablets) -------------------- */
+@media (min-width: 640px) {
+  .main { max-inline-size: 720px; margin-inline: auto; }
+  .tabbar { max-inline-size: 720px; margin-inline: auto; border-radius: var(--r-lg) var(--r-lg) 0 0;
+            border-inline: 1px solid var(--line); }
+  .stat-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* High-contrast / forced colours: keep structure visible. */
+@media (forced-colors: active) {
+  .card, .chip, .btn, .tabbar { border: 1px solid CanvasText; }
+}

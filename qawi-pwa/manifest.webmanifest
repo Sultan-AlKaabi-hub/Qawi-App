@@ -1,0 +1,93 @@
+{
+  "id": "./",
+  "name": "Qawi — Strength & Endurance",
+  "short_name": "Qawi",
+  "description": "Log every set, see which muscles carried the load, follow a 12-week plan, and find routes. Works with no connection.",
+  "lang": "en",
+  "dir": "auto",
+  "start_url": "./index.html?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui",
+    "browser"
+  ],
+  "orientation": "portrait",
+  "background_color": "#101012",
+  "theme_color": "#101012",
+  "categories": [
+    "health",
+    "fitness",
+    "sports",
+    "lifestyle"
+  ],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Start a session",
+      "short_name": "Train",
+      "description": "Open the session player and start logging sets",
+      "url": "./workout.html?source=shortcut",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Schedule plan",
+      "short_name": "Plan",
+      "description": "Set your training days for the next 12 weeks",
+      "url": "./plan.html?source=shortcut",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Routes",
+      "short_name": "Routes",
+      "description": "Browse saved and suggested routes",
+      "url": "./routes.html?source=shortcut",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}
